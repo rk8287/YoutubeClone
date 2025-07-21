@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Share2, Download } from "lucide-react";
 
 const VideoDetails = () => {
@@ -41,7 +41,7 @@ const VideoDetails = () => {
         <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] bg-black mb-4">
           <video
             src={`http://localhost:5000${video.videoUrl}`}
-            className="w-full h-full rounded-lg object-cover"
+            className="w-full h-full rounded-lg aspect-video"
             autoPlay
             muted
             playsInline
@@ -99,12 +99,13 @@ const VideoDetails = () => {
       {/* Right Sidebar - Related Videos */}
       <div className="w-full lg:w-[350px] flex flex-col gap-4">
         {relatedVideos.map((related) => (
-          <div
+          <Link
             key={related._id}
+            to={`/watch/${related._id}`}
             className="flex gap-2 cursor-pointer hover:bg-gray-800 p-2 rounded"
           >
             <img
-              src={`http://localhost:5000/${related.thumbnail}`}
+              src={`http://localhost:5000${related.thumbnail}`}
               alt={related.title}
               className="w-32 h-20 object-cover rounded"
             />
@@ -114,7 +115,7 @@ const VideoDetails = () => {
               </p>
               <p className="text-gray-400 text-xs">{related.channel.name}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

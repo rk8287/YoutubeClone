@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import VideoCard from "./VideoCard";
 import { fetchVideos } from "../../slice/videoSlice";
+import VideoCardSkeleton from "../pages/VideoCardSkeleton";
 
 export default function VideoGrid() {
   const dispatch = useDispatch();
@@ -15,7 +16,16 @@ export default function VideoGrid() {
   }, [dispatch, status]);
 
   if (status === "loading") {
-    return <p className="p-4 text-center">Loading videos...</p>;
+  
+    return (
+      <main className="grid gap-6 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+        {Array(6)
+          .fill(0)
+          .map((_, i) => (
+            <VideoCardSkeleton key={i} />
+          ))}
+      </main>
+    );
   }
 
   if (status === "failed") {
@@ -24,7 +34,7 @@ export default function VideoGrid() {
 
   return (
     <main className="grid gap-6 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-      {videos.map((video, index) => (
+      {videos.map((video, index) =>
         video && video._id ? (
           <motion.div
             key={video._id}
@@ -35,7 +45,7 @@ export default function VideoGrid() {
             <VideoCard video={video} />
           </motion.div>
         ) : null
-      ))}
+      )}
     </main>
   );
 }
