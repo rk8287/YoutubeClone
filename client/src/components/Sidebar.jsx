@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Home, PlaySquare, ListVideo, History, User } from "lucide-react";
 
-const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
-
+const Sidebar = ({ collapsed, setCollapsed }) => {
   const items = [
     { icon: <Home size={22} />, label: "Home" },
     { icon: <PlaySquare size={22} />, label: "Shorts" },
@@ -16,8 +14,8 @@ const Sidebar = () => {
   return (
     <aside
       className={`${
-        collapsed ? "w-20" : "w-60"
-      } bg-black text-white transition-all duration-300 h-screen fixed top-0 left-0 z-50`}
+        collapsed ? "w-16" : "w-60"
+      } bg-black text-white transition-all duration-300 h-screen hidden md:block fixed top-0 left-0 z-50`}
     >
       <div className="flex items-center justify-between p-4">
         <button

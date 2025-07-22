@@ -11,6 +11,8 @@ import CreateVideo from "./pages/CreateVideo";
 
 const AppLayout = () => {
   const [collapsed, setCollapsed] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const [searchQuery, setSearchQuery] = React.useState("");
   const location = useLocation();
 
   const authRoutes = ["/login", "/register"];
@@ -18,8 +20,11 @@ const AppLayout = () => {
 
   return (
     <div className="flex bg-black text-white min-h-screen">
+     
       {!isAuthPage && (
-        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <div className="hidden md:block">
+          <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        </div>
       )}
 
       <div
@@ -27,14 +32,20 @@ const AppLayout = () => {
           !isAuthPage ? (collapsed ? "md:pl-20" : "md:pl-60") : ""
         }`}
       >
-        <Header />
+        <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <Routes>
           <Route
             path="/"
             element={
               <>
-                <CategoryFilter />
-                <VideoGrid />
+                <CategoryFilter
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                />
+                <VideoGrid
+                  selectedCategory={selectedCategory}
+                  searchQuery={searchQuery}
+                />
               </>
             }
           />

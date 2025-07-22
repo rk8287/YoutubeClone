@@ -5,7 +5,7 @@ import VideoCard from "./VideoCard";
 import { fetchVideos } from "../../slice/videoSlice";
 import VideoCardSkeleton from "../pages/VideoCardSkeleton";
 
-export default function VideoGrid() {
+export default function VideoGrid({ selectedCategory, searchQuery }) {
   const dispatch = useDispatch();
   const { videos, status, error } = useSelector((state) => state.video);
 
@@ -15,10 +15,23 @@ export default function VideoGrid() {
     }
   }, [dispatch, status]);
 
+  const filteredVideos = videos.filter((video) => {
+    const text = (video.title + " " + video.description).toLowerCase();
+    const matchesCategory =
+      selectedCategory === "All"
+        ? true
+        : text.includes(selectedCategory.toLowerCase());
+    const matchesSearch =
+      searchQuery.trim() === ""
+        ? true
+        : text.includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
   if (status === "loading") {
-  
     return (
-      <main className="grid gap-6 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      <main className="grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         {Array(6)
           .fill(0)
           .map((_, i) => (
@@ -33,19 +46,17 @@ export default function VideoGrid() {
   }
 
   return (
-    <main className="grid gap-6 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-      {videos.map((video, index) =>
-        video && video._id ? (
-          <motion.div
-            key={video._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <VideoCard video={video} />
-          </motion.div>
-        ) : null
-      )}
+    <main className="grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      {filteredVideos.map((video, index) => (
+        <motion.div
+          key={video._id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+        >
+          <VideoCard video={video} />
+        </motion.div>
+      ))}
     </main>
   );
 }

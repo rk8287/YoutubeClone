@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { MdOutlineVerified } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Share2, Download, Trash } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -125,8 +126,11 @@ const VideoDetails = () => {
               className="w-10 h-10 rounded-full"
             />
             <div>
-              <p className="font-semibold">{video.channel.name}</p>
-              <p className="text-gray-400 text-sm">Subscriber count not implemented</p>
+              <div className="flex items-center">
+                <p className="font-semibold">{video.channel.name}</p>
+              <p className="px-1"><MdOutlineVerified /></p>
+              </div>
+              <p className="text-gray-400 text-sm">531K subscribers</p>
             </div>
             <button
               onClick={handleSubscribe}
