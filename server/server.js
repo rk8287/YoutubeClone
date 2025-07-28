@@ -6,13 +6,15 @@ const authRoutes = require("./routes/auth");
 const videoRoutes = require("./routes/videos");
 const commentRoutes = require("./routes/comment");
 
+require('dotenv').config();
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-mongoose.connect("mongodb+srv://rounak8287:Rounak92@cluster0.sd6la4x.mongodb.net/youtubeClone")
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected!"))
   .catch(err => console.error(err));
 

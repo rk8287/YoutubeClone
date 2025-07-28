@@ -10,7 +10,14 @@ const Header = ({ searchQuery, setSearchQuery }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
+
   const [showSearch, setShowSearch] = useState(false);
+  const [inputValue, setInputValue] = useState(searchQuery || "");
+
+
+   const handleSearchClick = () => {
+    setSearchQuery(inputValue);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -32,12 +39,12 @@ const Header = ({ searchQuery, setSearchQuery }) => {
         <input
           type="text"
           placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           className="bg-gray-800 text-white border border-gray-600 rounded-full px-4 py-2 w-full focus:ring-2 focus:ring-red-600 outline-none text-sm md:text-base"
         />
         <button className="bg-gray-800 p-2 rounded-full hover:bg-gray-700">
-          <Search className="w-5 h-5" />
+          <Search onClick={handleSearchClick} className="w-5 h-5" />
         </button>
       </div>
 

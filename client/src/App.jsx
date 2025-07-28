@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VideoDetails from "./components/VideoDetails";
 import CreateVideo from "./pages/CreateVideo";
+import Profile from "./components/Profile";
 
 const AppLayout = () => {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -53,6 +54,7 @@ const AppLayout = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/watch/:id" element={<VideoDetails />} />
           <Route path="/upload" element={<CreateVideo />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
