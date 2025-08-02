@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Home, PlaySquare, ListVideo, History, User } from "lucide-react";
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const items = [
-    { icon: <Home size={22} />, label: "Home" },
-    { icon: <PlaySquare size={22} />, label: "Shorts" },
-    { icon: <ListVideo size={22} />, label: "Subscriptions" },
-    { icon: <History size={22} />, label: "History" },
-    { icon: <User size={22} />, label: "You" },
+    { icon: <Home size={22} />, label: "Home", path: "/" },
+    { icon: <PlaySquare size={22} />, label: "Shorts", path: "/shorts" },
+    { icon: <ListVideo size={22} />, label: "Subscriptions", path: "/subscriptions" },
+    { icon: <History size={22} />, label: "History", path: "/history" },
+    { icon: <User size={22} />, label: "You", path: "/profile" },
   ];
 
   return (
@@ -29,15 +30,16 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
       <nav className="flex flex-col gap-2 mt-4">
         {items.map((item, idx) => (
-          <div
+          <Link
             key={idx}
+            to={item.path}
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-4"
-            } hover:bg-gray-800 p-3 rounded-lg cursor-pointer`}
+            } hover:bg-gray-800 p-3 rounded-lg cursor-pointer transition-colors`}
           >
             {item.icon}
             {!collapsed && <span className="text-sm">{item.label}</span>}
-          </div>
+          </Link>
         ))}
       </nav>
     </aside>
