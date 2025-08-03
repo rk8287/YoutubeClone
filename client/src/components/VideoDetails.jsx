@@ -11,19 +11,31 @@ const VideoDetails = () => {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
 
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
 
   const getAvatarUrl = (avatar) => {
     if (!avatar) return "/default-avatar.png";
-    return avatar.startsWith("http") ? avatar : `http://localhost:5000${avatar}`;
+    return avatar.startsWith("http")
+      ? avatar
+      : `http://localhost:5000${avatar}`;
   };
 
   useEffect(() => {
     const fetchVideo = async () => {
-      const res = await fetch(`http://localhost:5000/api/videos/${id}`);
+      const res = await fetch(`http://localhost:5000/api/videos/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       const data = await res.json();
       setVideo(data);
+
+      if (user) {
+        setIsLiked(data.likedBy?.includes(user._id));
+        setIsSubscribed(data.subscribers?.includes(user._id));
+      }
     };
 
     const fetchRelated = async () => {
@@ -41,7 +53,7 @@ const VideoDetails = () => {
     fetchVideo();
     fetchRelated();
     fetchComments();
-  }, [id]);
+  }, [id, token, user]);
 
   const handleLike = async () => {
     if (!token) return alert("You need to login to like");
@@ -52,17 +64,22 @@ const VideoDetails = () => {
     });
 
     const data = await res.json();
-    setVideo({ ...video, likes: data.likes });
+    setVideo((prev) => ({ ...prev, likes: data.likes }));
+    setIsLiked(!isLiked);
   };
 
   const handleSubscribe = async () => {
     if (!token) return alert("You need to login to subscribe");
 
-    await fetch(`http://localhost:5000/api/videos/subscribe/${video.channel.id}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    alert("Subscribed/Unsubscribed!");
+    await fetch(
+      `http://localhost:5000/api/videos/subscribe/${video.channel.id}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setIsSubscribed(!isSubscribed);
   };
 
   const handleShare = () => {
@@ -99,7 +116,8 @@ const VideoDetails = () => {
     setComments(comments.filter((c) => c._id !== commentId));
   };
 
-  if (!video) return <div className="text-center mt-20 text-white">Loading...</div>;
+  if (!video)
+    return <div className="text-center mt-20 text-white">Loading...</div>;
 
   return (
     <div className="flex flex-col lg:flex-row p-4 gap-6">
@@ -119,35 +137,57 @@ const VideoDetails = () => {
 
         <div className="flex justify-between items-center mb-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <img
-              src={getAvatarUrl(video.channel.avatar)}
-              onError={(e) => (e.target.src = "/default-avatar.png")}
-              alt={video.channel.name}
-              className="w-10 h-10 rounded-full"
-            />
-            <div>
-              <div className="flex items-center">
-                <p className="font-semibold">{video.channel.name}</p>
-              <p className="px-1"><MdOutlineVerified /></p>
+            <Link
+              to={`/channel/${video.channel.id}`}
+              className="flex items-center gap-3"
+            >
+              <img
+                src={getAvatarUrl(video.channel.avatar)}
+                onError={(e) => (e.target.src = "/default-avatar.png")}
+                alt={video.channel.name}
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <div className="flex items-center">
+                  <p className="font-semibold hover:underline">
+                    {video.channel.name}
+                  </p>
+                  <p className="px-1">
+                    <MdOutlineVerified />
+                  </p>
+                </div>
+                <p className="text-gray-400 text-sm">531K subscribers</p>
               </div>
-              <p className="text-gray-400 text-sm">531K subscribers</p>
-            </div>
+            </Link>
+
             <button
               onClick={handleSubscribe}
-              className="ml-4 bg-white text-black px-4 py-1 rounded font-semibold hover:bg-gray-200"
+              className={`ml-4 px-4 py-1 rounded font-semibold ${
+                isSubscribed
+                  ? "bg-gray-700 text-white"
+                  : "bg-white text-black hover:bg-gray-200"
+              }`}
             >
-              Subscribe
+              {isSubscribed ? "Subscribed" : "Subscribe"}
             </button>
           </div>
 
           <div className="flex items-center gap-4 mt-4 lg:mt-0">
-            <button onClick={handleLike} className="flex items-center gap-1 hover:text-gray-400">
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-1 ${
+                isLiked ? "text-red-500" : "hover:text-gray-400"
+              }`}
+            >
               <ThumbsUp size={20} /> {video.likes || 0}
             </button>
             <button className="flex items-center gap-1 hover:text-gray-400">
               <ThumbsDown size={20} />
             </button>
-            <button onClick={handleShare} className="flex items-center gap-1 hover:text-gray-400">
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1 hover:text-gray-400"
+            >
               <Share2 size={20} /> Share
             </button>
             <a
@@ -178,7 +218,10 @@ const VideoDetails = () => {
               placeholder="Add a comment..."
               className="flex-1 bg-gray-800 p-3 rounded outline-none"
             />
-            <button onClick={handleComment} className="bg-red-600 px-4 py-2 rounded">
+            <button
+              onClick={handleComment}
+              className="bg-red-600 px-4 py-2 rounded"
+            >
               Comment
             </button>
           </div>
@@ -195,11 +238,16 @@ const VideoDetails = () => {
               />
               <div className="flex-1">
                 <p className="font-semibold text-sm">{c.userName}</p>
-                <p className="text-gray-400 text-xs">{new Date(c.createdAt).toLocaleString()}</p>
+                <p className="text-gray-400 text-xs">
+                  {new Date(c.createdAt).toLocaleString()}
+                </p>
                 <p>{c.text}</p>
               </div>
               {user && c.userId === user._id && (
-                <button onClick={() => handleDeleteComment(c._id)} className="text-red-500">
+                <button
+                  onClick={() => handleDeleteComment(c._id)}
+                  className="text-red-500"
+                >
                   <Trash size={16} />
                 </button>
               )}
@@ -221,7 +269,9 @@ const VideoDetails = () => {
               className="w-32 h-20 object-cover rounded"
             />
             <div>
-              <p className="font-semibold text-sm line-clamp-2">{related.title}</p>
+              <p className="font-semibold text-sm line-clamp-2">
+                {related.title}
+              </p>
               <p className="text-gray-400 text-xs">{related.channel.name}</p>
             </div>
           </Link>

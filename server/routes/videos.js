@@ -5,6 +5,7 @@ const {
   createVideo,
   getAllVideos,
   getVideoById,
+  getVideosByChannelId,
 } = require("../controllers/videoController");
 const auth = require("../middleware/authMiddleware");
 
@@ -35,5 +36,8 @@ router.post(
 router.get("/", getAllVideos);
 
 router.get("/:id", getVideoById);
+
+router.get("/channel/:channelId", getVideosByChannelId);
+
 
 module.exports = router;

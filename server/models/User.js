@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   avatar: String,
-},{ timestamps: true });
+}, { timestamps: true });
+
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -14,8 +15,20 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+
 userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
+
+
+userSchema.virtual("videos", {
+  ref: "Video",
+  localField: "_id",
+  foreignField: "user",
+});
+
+userSchema.set("toObject", { virtuals: true });
+userSchema.set("toJSON", { virtuals: true });
+
 
 module.exports = mongoose.model("User", userSchema);

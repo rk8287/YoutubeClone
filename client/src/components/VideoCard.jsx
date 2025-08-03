@@ -6,7 +6,7 @@ export default function VideoCard({ video }) {
     <Link to={`/watch/${video._id}`} className="block">
       <div className="bg-black rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 shadow-lg cursor-pointer">
         
-        {/* Thumbnail: Responsive */}
+      
         <div className="relative w-full pb-[56.25%] bg-black">
           <img
             src={`http://localhost:5000${video.thumbnail}`}
@@ -15,7 +15,7 @@ export default function VideoCard({ video }) {
           />
         </div>
 
-        {/* Video Info */}
+       
         <div className="flex p-3 gap-3">
           <img
             src={video.channel.avatar}

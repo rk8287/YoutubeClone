@@ -42,3 +42,22 @@ exports.getVideoById = async (req, res) => {
 
   res.json(video);
 };
+
+
+
+exports.getVideosByChannelId = async (req, res) => {
+  try {
+    const { channelId } = req.params;
+
+    const videos = await Video.find({ "channel.id": channelId }).sort({ createdAt: -1 });
+
+    if (!videos.length) {
+      return res.status(404).json({ message: "No videos found for this channel." });
+    }
+
+    res.status(200).json(videos);
+  } catch (error) {
+    console.error("Error fetching channel videos:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
