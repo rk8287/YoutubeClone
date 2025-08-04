@@ -4,12 +4,14 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { Home, PlaySquare, ListVideo, History, User } from "lucide-react";
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
+
+  
   const items = [
     { icon: <Home size={22} />, label: "Home", path: "/" },
     { icon: <PlaySquare size={22} />, label: "Shorts", path: "/shorts" },
     { icon: <ListVideo size={22} />, label: "Subscriptions", path: "/subscriptions" },
     { icon: <History size={22} />, label: "History", path: "/history" },
-    { icon: <User size={22} />, label: "You", path: "/profile" },
+    { icon: <User size={22} />, label: "You", path: "/channel/:channelId" },
   ];
 
   return (

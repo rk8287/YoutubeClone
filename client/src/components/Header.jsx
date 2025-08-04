@@ -61,7 +61,7 @@ const Header = ({ searchQuery, setSearchQuery }) => {
       <div className="flex items-center gap-3 md:gap-4">
         {user ? (
           <>
-            <Link to="/upload">
+            <Link to="/create-channel">
               <PlusCircle className="w-5 h-5 md:w-6 md:h-6 cursor-pointer" />
             </Link>
             <Bell className="w-5 h-5 md:w-6 md:h-6 cursor-pointer" />

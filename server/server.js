@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const authRoutes = require("./routes/auth");
-const videoRoutes = require("./routes/videos");
 const commentRoutes = require("./routes/comment");
+const channelRoutes = require("./routes/channel");
 
 
 require('dotenv').config();
@@ -20,8 +20,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/videos", videoRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/channel", channelRoutes)
 
 
 const PORT = process.env.PORT || 5000;

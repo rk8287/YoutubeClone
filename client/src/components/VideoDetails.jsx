@@ -1,119 +1,75 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineVerified } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
-import { ThumbsUp, ThumbsDown, Share2, Download, Trash } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Share2, Download, Trash2 } from "lucide-react";
+import dummyVideos from "../data/videos";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const VideoDetails = () => {
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState("");
-
   const [isLiked, setIsLiked] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
-
-  const getAvatarUrl = (avatar) => {
-    if (!avatar) return "/default-avatar.png";
-    return avatar.startsWith("http")
-      ? avatar
-      : `http://localhost:5000${avatar}`;
-  };
+  const user = useSelector((state) => state.auth?.user || null);
+  const token = useSelector((state) => state.auth?.token || null);
 
   useEffect(() => {
-    const fetchVideo = async () => {
-      const res = await fetch(`http://localhost:5000/api/videos/${id}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const data = await res.json();
-      setVideo(data);
+    const selected = dummyVideos.find((v) => v.id === id);
+    setVideo(selected);
+    setRelatedVideos(dummyVideos.filter((v) => v.id !== id));
+  }, [id]);
 
-      if (user) {
-        setIsLiked(data.likedBy?.includes(user._id));
-        setIsSubscribed(data.subscribers?.includes(user._id));
-      }
-    };
+  useEffect(() => {
+    if (id) fetchComments();
+  }, [id]);
 
-    const fetchRelated = async () => {
-      const res = await fetch("http://localhost:5000/api/videos");
-      const data = await res.json();
-      setRelatedVideos(data.filter((v) => v._id !== id));
-    };
-
-    const fetchComments = async () => {
-      const res = await fetch(`http://localhost:5000/api/comments/${id}`);
-      const data = await res.json();
-      setComments(data);
-    };
-
-    fetchVideo();
-    fetchRelated();
-    fetchComments();
-  }, [id, token, user]);
-
-  const handleLike = async () => {
-    if (!token) return alert("You need to login to like");
-
-    const res = await fetch(`http://localhost:5000/api/videos/like/${id}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const data = await res.json();
-    setVideo((prev) => ({ ...prev, likes: data.likes }));
-    setIsLiked(!isLiked);
+  const fetchComments = async () => {
+    try {
+      const res = await axios.get(`/api/comments/${id}`);
+      setComments(res.data.comments || []);
+    } catch (err) {
+      console.error("Failed to fetch comments", err);
+      setComments([]);
+    }
   };
 
-  const handleSubscribe = async () => {
-    if (!token) return alert("You need to login to subscribe");
-
-    await fetch(
-      `http://localhost:5000/api/videos/subscribe/${video.channel.id}`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    setIsSubscribed(!isSubscribed);
-  };
-
+  const handleLike = () => setIsLiked((prev) => !prev);
+  const handleSubscribe = () => setIsSubscribed((prev) => !prev);
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     alert("Link copied to clipboard!");
   };
 
-  const handleComment = async () => {
-    if (!token) return alert("You need to login to comment");
-    if (!commentText.trim()) return;
-
-    const res = await fetch("http://localhost:5000/api/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ videoId: id, text: commentText }),
-    });
-
-    const newComment = await res.json();
-    setComments([newComment, ...comments]);
-    setCommentText("");
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    try {
+      const res = await axios.post(
+        "/api/comments",
+        { videoId: id, text: newComment },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setComments((prev) => [res.data, ...prev]);
+      setNewComment("");
+    } catch (err) {
+      console.error("Failed to add comment", err);
+    }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!token) return alert("You need to login to delete comments");
-
-    await fetch(`http://localhost:5000/api/comments/${commentId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setComments(comments.filter((c) => c._id !== commentId));
+    try {
+      await axios.delete(`/api/comments/${commentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setComments(comments.filter((c) => c._id !== commentId));
+    } catch (err) {
+      console.error("Failed to delete comment", err);
+    }
   };
 
   if (!video)
@@ -124,7 +80,7 @@ const VideoDetails = () => {
       <div className="flex-1">
         <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] bg-black mb-4">
           <video
-            src={`http://localhost:5000${video.videoUrl}`}
+            src={video.videoUrl}
             className="w-full h-full rounded-lg aspect-video"
             autoPlay
             muted={false}
@@ -137,26 +93,26 @@ const VideoDetails = () => {
 
         <div className="flex justify-between items-center mb-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <Link
-              to={`/channel/${video.channel.id}`}
-              className="flex items-center gap-3"
+           <Link to={`/channel/${video.channel?.id}`}
+              className="flex items-center gap-3 hover:opacity-90"
             >
               <img
-                src={getAvatarUrl(video.channel.avatar)}
-                onError={(e) => (e.target.src = "/default-avatar.png")}
-                alt={video.channel.name}
+                src={video?.channel?.avatar || "https://i.pravatar.cc/150"}
+                alt={video?.channel?.name || video.author}
                 className="w-10 h-10 rounded-full"
               />
               <div>
                 <div className="flex items-center">
                   <p className="font-semibold hover:underline">
-                    {video.channel.name}
+                    {video?.channel?.name || video.author}
                   </p>
-                  <p className="px-1">
+                  <span className="px-1 text-blue-500">
                     <MdOutlineVerified />
-                  </p>
+                  </span>
                 </div>
-                <p className="text-gray-400 text-sm">531K subscribers</p>
+                <p className="text-gray-400 text-sm">
+                  {video?.subscriber || "1K subscribers"}
+                </p>
               </div>
             </Link>
 
@@ -179,7 +135,7 @@ const VideoDetails = () => {
                 isLiked ? "text-red-500" : "hover:text-gray-400"
               }`}
             >
-              <ThumbsUp size={20} /> {video.likes || 0}
+              <ThumbsUp size={20} /> {isLiked ? 1 : 0}
             </button>
             <button className="flex items-center gap-1 hover:text-gray-400">
               <ThumbsDown size={20} />
@@ -191,7 +147,7 @@ const VideoDetails = () => {
               <Share2 size={20} /> Share
             </button>
             <a
-              href={`http://localhost:5000${video.videoUrl}`}
+              href={video.videoUrl}
               download
               className="flex items-center gap-1 hover:text-gray-400"
             >
@@ -200,79 +156,84 @@ const VideoDetails = () => {
           </div>
         </div>
 
-        <p className="text-gray-300 text-sm">{video.description}</p>
+        <p className="text-gray-300 text-sm mb-4">{video.description}</p>
 
-        <h2 className="mt-6 text-lg font-semibold">Comments</h2>
-
-        {user && (
-          <div className="flex gap-3 mt-3">
-            <img
-              src={getAvatarUrl(user.avatar)}
-              onError={(e) => (e.target.src = "/default-avatar.png")}
-              alt="avatar"
-              className="w-10 h-10 rounded-full"
-            />
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a comment..."
-              className="flex-1 bg-gray-800 p-3 rounded outline-none"
-            />
-            <button
-              onClick={handleComment}
-              className="bg-red-600 px-4 py-2 rounded"
-            >
-              Comment
-            </button>
-          </div>
-        )}
-
-        <div className="mt-4 space-y-4">
-          {comments.map((c) => (
-            <div key={c._id} className="flex gap-3 items-start">
-              <img
-                src={getAvatarUrl(c.userAvatar)}
-                onError={(e) => (e.target.src = "/default-avatar.png")}
-                className="w-8 h-8 rounded-full"
-                alt="avatar"
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-2">Comments</h2>
+          {user ? (
+            <form onSubmit={handleCommentSubmit} className="flex gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="flex-1 px-3 py-2 rounded bg-gray-800 text-white"
               />
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{c.userName}</p>
-                <p className="text-gray-400 text-xs">
-                  {new Date(c.createdAt).toLocaleString()}
-                </p>
-                <p>{c.text}</p>
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+              >
+                Comment
+              </button>
+            </form>
+          ) : (
+            <p className="text-gray-400 mb-4">Login to post comments</p>
+          )}
+
+          {Array.isArray(comments) && comments.length > 0 ? (
+            comments.map((comment) => (
+              <div
+                key={comment._id}
+                className="flex items-start gap-3 mb-3 border-b border-gray-700 pb-3"
+              >
+                <img
+                  src={comment.userAvatar || "https://i.pravatar.cc/150"}
+                  alt="avatar"
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold text-sm">{comment.userName}</p>
+                    {user?._id === comment.userId && (
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-gray-300 text-sm mt-1">{comment.text}</p>
+                </div>
               </div>
-              {user && c.userId === user._id && (
-                <button
-                  onClick={() => handleDeleteComment(c._id)}
-                  className="text-red-500"
-                >
-                  <Trash size={16} />
-                </button>
-              )}
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-gray-500 text-sm">No comments yet.</p>
+          )}
         </div>
       </div>
 
       <div className="w-full lg:w-[350px] flex flex-col gap-4">
         {relatedVideos.map((related) => (
           <Link
-            key={related._id}
-            to={`/watch/${related._id}`}
+            key={related.id}
+            to={`/watch/${related.id}`}
             className="flex gap-2 cursor-pointer hover:bg-gray-800 p-2 rounded"
           >
             <img
-              src={`http://localhost:5000${related.thumbnail}`}
+              src={related.thumbnailUrl}
               alt={related.title}
+              onError={(e) =>
+                (e.target.src =
+                  "https://via.placeholder.com/320x180?text=No+Image")
+              }
               className="w-32 h-20 object-cover rounded"
             />
             <div>
               <p className="font-semibold text-sm line-clamp-2">
                 {related.title}
               </p>
-              <p className="text-gray-400 text-xs">{related.channel.name}</p>
+              <p className="text-gray-400 text-xs">{related.author}</p>
             </div>
           </Link>
         ))}

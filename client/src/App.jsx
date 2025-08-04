@@ -7,8 +7,8 @@ import VideoGrid from "./components/VideoGrid";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VideoDetails from "./components/VideoDetails";
-import CreateVideo from "./pages/CreateVideo";
 import ChannelProfile from "./pages/ChannelProfile";
+import CreateChannel from "./pages/CreateChannel";
 
 const AppLayout = () => {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -53,7 +53,7 @@ const AppLayout = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/watch/:id" element={<VideoDetails />} />
-          <Route path="/upload" element={<CreateVideo />} />
+          <Route path="/create-channel" element={<CreateChannel />} />
           <Route path="/channel/:channelId" element={<ChannelProfile />} />
 
           <Route path="*" element={<Navigate to="/" />} />

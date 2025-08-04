@@ -14,6 +14,8 @@ const categories = [
   "Track Tutorial"
 ];
 
+
+
 const CategoryFilter = ({ selectedCategory, setSelectedCategory }) => {
   return (
     <div className="flex gap-3 overflow-x-auto p-3 md:p-4 bg-black border-b border-gray-700 scrollbar-hide">

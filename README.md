@@ -1,18 +1,21 @@
 ## 📺 YouTube Clone (MERN Stack)
 
-A full-stack YouTube Clone built using **MongoDB, Express, React, and Node.js**. Users can register, log in, upload videos, comment, and view videos — just like the real YouTube experience.
+A full-stack YouTube Clone built using **MongoDB, Express, React, and Node.js**. Users can register, log in, create channels, and manage their own content — just like a real YouTube experience.
 
 ---
 
 ## 🚀 Features
 
 * 🔐 User Registration & Login (JWT Auth)
-* 📤 Video Upload & Thumbnail Preview
+* 📺 Channel Creation (Only after login)
+* 👤 Dynamic Channel Profile Page
+* 📤 Video Upload (from within your channel)
+* 🖼️ Thumbnail Upload & Preview
 * 🎥 Video Playback (Responsive Player)
 * 💬 Comment System
-* 👤 Dynamic User Profiles
+* 🔎 Search & Category Filters
 * 🧠 Redux Toolkit for Global State
-* ⚡️ Mobile Responsive (Like real YouTube mobile UI)
+* ⚡️ Fully Mobile Responsive
 
 ---
 
@@ -30,21 +33,24 @@ A full-stack YouTube Clone built using **MongoDB, Express, React, and Node.js**.
 ## 📁 Folder Structure (Basic)
 
 ```
+
 YoutubeClone/
 ├── client/                # React frontend
 │   ├── src/
-│   │   ├── components/    # UI components
-│   │   ├── pages/         # App pages (Home, Login, Profile)
-│   │   ├── redux/         # Redux slices
-│   │   └── App.jsx        # App entry
-│   └── vite.config.js
+│   │   ├── components/    # Reusable components
+│   │   ├── pages/         # Pages like Home, Watch, ChannelProfile
+│   │   ├── redux/         # Redux slices for state
+│   │   └── App.jsx        # App entry point
+│   └── vite.config.js     # Vite config
 ├── server/                # Node/Express backend
 │   ├── routes/            # API routes
-│   ├── models/            # MongoDB models
-│   ├── uploads/           # Uploaded videos
-│   └── server.js          # Main server file
-└── README.md
-```
+│   ├── controllers/       # Controller logic
+│   ├── models/            # Mongoose models (User, Channel, Video)
+│   ├── uploads/           # Uploaded files
+│   └── server.js          # Main entry point
+└── README.md              # Project documentation
+
+````
 
 ---
 
@@ -52,9 +58,9 @@ YoutubeClone/
 
 ### Prerequisites:
 
-* Node.js and npm installed
-* MongoDB Atlas account (or local MongoDB)
-* Git
+- Node.js and npm
+- MongoDB Atlas or local MongoDB
+- Git
 
 ---
 
@@ -63,7 +69,7 @@ YoutubeClone/
 ```bash
 git clone https://github.com/rk8287/youtube-clone.git
 cd youtube-clone
-```
+````
 
 ---
 
@@ -81,13 +87,13 @@ MONGO_URI=your_mongo_connection_string
 PORT=5000
 ```
 
-#### Then start the backend:
+Start the server:
 
 ```bash
 nodemon server.js
 ```
 
-✅ Server runs at `http://localhost:5000`
+✅ Backend runs at: `http://localhost:5000`
 
 ---
 
@@ -98,32 +104,39 @@ cd client
 npm install
 ```
 
-#### Create a `.env` file inside the `client/` folder (Optional):
+#### Optional: Create a `.env` file inside `client/`:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-#### Then start the frontend:
+Start the frontend:
 
 ```bash
 npm run dev
 ```
 
-✅ Frontend runs at `http://localhost:5173`
+✅ Frontend runs at: `http://localhost:5173`
+
+---
+
+## 🧭 App Flow
+
+1. **Login / Register**
+2. **Create Your Channel**
+3. **Upload Videos via Channel**
+4. **Browse or Search Videos**
+5. **Filter Videos by Category**
+6. **Watch, Like, and Comment**
 
 ---
 
 ## 🌐 Accessing from Mobile (Same Wi-Fi)
 
-To test on mobile:
-
-1. Make sure your **mobile and PC are on same Wi-Fi**
-2. Find your **local IP** (e.g., `192.168.1.4`)
-3. Open frontend: `http://192.168.1.4:5173`
-4. Make sure the backend also listens on the same IP
-
-Update the VITE\_API\_URL in `client/.env` to match:
+1. Connect both devices to the same Wi-Fi
+2. Find your PC's local IP (e.g. `192.168.1.4`)
+3. Access on mobile: `http://192.168.1.4:5173`
+4. Set the API URL in `.env`:
 
 ```
 VITE_API_URL=http://192.168.1.4:5000/api
@@ -131,10 +144,11 @@ VITE_API_URL=http://192.168.1.4:5000/api
 
 ---
 
-## 🧪 Future Improvements
+## 🔮 Future Improvements
 
-* Like/Dislike Functionality
-* Search and Filtering
+* Like/Dislike Buttons
+* Subscriptions
+* Login User can access createChannel Page
 
 
 ---
