@@ -13,7 +13,6 @@ function CreateChannel() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { channel, loading } = useSelector((state) => state.channel);
 
   const handleChange = (e) => {
@@ -32,50 +31,54 @@ function CreateChannel() {
   }, [channel, navigate]);
 
   return (
-    <div className="max-w-xl mx-auto mt-10 text-white">
-      <h2 className="text-2xl mb-4 font-bold">Create Channel</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Channel Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-gray-800 text-white"
-        />
-        <input
-          type="text"
-          name="avatar"
-          placeholder="Avatar URL"
-          value={form.avatar}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-gray-800 text-white"
-        />
-        <input
-          type="text"
-          name="banner"
-          placeholder="Banner URL"
-          value={form.banner}
-          onChange={handleChange}
-          required
-          className="w-full p-2 rounded bg-gray-800 text-white"
-        />
-        <textarea
-          name="description"
-          placeholder="Channel Description"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full p-2 rounded bg-gray-800 text-white"
-        />
-        <button
-          type="submit"
-          className="bg-red-600 px-4 py-2 rounded text-white hover:bg-red-700"
-        >
-          {loading ? "Creating..." : "Create Channel"}
-        </button>
-      </form>
+    <div className="min-h-screen bg-black px-4 py-10 text-white flex justify-center items-start">
+      <div className="w-full max-w-screen-md bg-gray-900 rounded-xl p-6 shadow-lg">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Create Your Channel</h2>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <input
+            type="text"
+            name="name"
+            placeholder="Channel Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <input
+            type="text"
+            name="avatar"
+            placeholder="Avatar Image URL"
+            value={form.avatar}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <input
+            type="text"
+            name="banner"
+            placeholder="Banner Image URL"
+            value={form.banner}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <textarea
+            name="description"
+            placeholder="Channel Description"
+            value={form.description}
+            onChange={handleChange}
+            rows={4}
+            className="w-full px-4 py-3 rounded-md bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-red-600 hover:bg-red-700 transition-colors duration-200 py-3 rounded-md font-semibold text-white"
+          >
+            {loading ? "Creating..." : "Create Channel"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
