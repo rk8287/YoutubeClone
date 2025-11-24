@@ -6,7 +6,7 @@ const authRoutes = require("./routes/auth");
 const commentRoutes = require("./routes/comment");
 const channelRoutes = require("./routes/channel");
 
-
+//env 
 require('dotenv').config();
 
 const app = express();
